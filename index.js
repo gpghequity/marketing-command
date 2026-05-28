@@ -127,6 +127,10 @@ function getTransporter() {
   });
 }
 
+app.get('/healthz', (req, res) => {
+  res.json({ status: 'ok', service: 'marketing-command', version: APP_VERSION });
+});
+
 app.get('/', (req, res) => {
   res.render('home');
 });
