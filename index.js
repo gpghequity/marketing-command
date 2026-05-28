@@ -111,6 +111,21 @@ const intakes = [
 
 let nextIntakeId = 4;
 
+// Daily email cap — 20 intake notification emails/day max
+let _mktDailySent = 0;
+let _mktDailyDate = '';
+const MKT_DAILY_CAP = 20;
+function mktCapReached() {
+  const today = new Date().toISOString().slice(0, 10);
+  if (_mktDailyDate !== today) { _mktDailySent = 0; _mktDailyDate = today; }
+  return _mktDailySent >= MKT_DAILY_CAP;
+}
+function mktIncrementSent(n = 1) {
+  const today = new Date().toISOString().slice(0, 10);
+  if (_mktDailyDate !== today) { _mktDailySent = 0; _mktDailyDate = today; }
+  _mktDailySent += n;
+}
+
 function requireAdmin(req, res, next) {
   if (req.session && req.session.admin) return next();
   res.redirect('/login');
@@ -182,7 +197,7 @@ app.post('/submit-intake', async (req, res) => {
   intakes.unshift(intake);
 
   const transporter = getTransporter();
-  if (transporter) {
+  if (transporter && !mktCapReached()) {
     const adminHtml = `
       <h2>New Marketing Command Intake</h2>
       <p><strong>${intake.firstName} ${intake.lastName}</strong> &lt;${intake.email}&gt; &middot; ${intake.phone}</p>
@@ -218,11 +233,12 @@ app.post('/submit-intake', async (req, res) => {
           <p>— Stephen Franco<br>Founder, Projects with a Purpose LLC</p>
         `
       });
+      mktIncrementSent(2);
     } catch (err) {
       console.error('Email send failed:', err.message);
     }
   } else {
-    console.log('[intake] email transport not configured, skipped sending');
+    console.log('[intake] email transport not configured or daily cap reached, skipped sending');
   }
 
   res.redirect('/thank-you');
