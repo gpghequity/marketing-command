@@ -484,7 +484,11 @@ app.use((err, req, res, next) => {
   });
 });
 
-app.listen(PORT, () => {
-  console.log(`Marketing Command ${APP_VERSION} listening on http://localhost:${PORT}`);
-  console.log(`Last deploy: ${LAST_DEPLOY}`);
-});
+if (require.main === module) {
+  app.listen(PORT, () => {
+    console.log(`Marketing Command ${APP_VERSION} listening on http://localhost:${PORT}`);
+    console.log(`Last deploy: ${LAST_DEPLOY}`);
+  });
+}
+
+module.exports = app;

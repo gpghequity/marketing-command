@@ -1,0 +1,23 @@
+﻿{
+    "name":  "marketing-command",
+    "version":  "1.0.0",
+    "description":  "Marketing Command - Marketing and Communications OS for Real Estate Professionals",
+    "main":  "index.js",
+    "scripts":  {
+                    "start":  "node index.js",
+                    "test":  "vitest run"
+                },
+    "dependencies":  {
+                         "body-parser":  "^1.20.2",
+                         "dotenv":  "^16.3.1",
+                         "ejs":  "^3.1.9",
+                         "express":  "^4.18.2",
+                         "express-rate-limit":  "^8.5.2",
+                         "express-session":  "^1.17.3",
+                         "nodemailer":  "^6.9.7"
+                     },
+    "devDependencies":  {
+                            "supertest":  "^7.2.2",
+                            "vitest":  "^4.1.7"
+                        }
+}
