@@ -1,0 +1,79 @@
+<%- include('partials/header', { pageTitle: 'Tools Catalog', bodyClass: 'page-tools' }) %>
+
+<div class="page-header">
+  <div class="inner">
+    <h1>Every tool in the Marketing Command stack</h1>
+    <p class="sub">Pre-integrated, professionally managed, covered by one monthly bill.</p>
+  </div>
+</div>
+
+<div class="filter-bar">
+  <div class="filter-inner" id="filter-bar">
+    <button class="filter-chip active" data-filter="all">All</button>
+    <button class="filter-chip" data-filter="CRM">CRM</button>
+    <button class="filter-chip" data-filter="Phone">Phone</button>
+    <button class="filter-chip" data-filter="SMS">SMS</button>
+    <button class="filter-chip" data-filter="Email">Email</button>
+    <button class="filter-chip" data-filter="Calendar">Calendar</button>
+    <button class="filter-chip" data-filter="Video">Video</button>
+    <button class="filter-chip" data-filter="Landing Pages">Landing Pages</button>
+    <button class="filter-chip" data-filter="Content">Content</button>
+    <button class="filter-chip" data-filter="Social">Social</button>
+    <button class="filter-chip" data-filter="Direct Mail">Direct Mail</button>
+    <button class="filter-chip" data-filter="Analytics">Analytics</button>
+  </div>
+</div>
+
+<section class="tools-catalog">
+  <div class="tools-grid" id="tools-grid">
+    <% tools.forEach(function(tool) { %>
+      <div class="tool-card" data-categories="<%= tool.categories.join('|') %>">
+        <div class="tool-card-head">
+          <span class="tool-icon"><%= tool.icon %></span>
+          <div>
+            <h3><%= tool.name %></h3>
+            <div class="tool-tagline"><%= tool.tagline %></div>
+          </div>
+        </div>
+        <div class="tool-card-categories">
+          <% tool.categories.forEach(function(cat) { %>
+            <span class="cat-chip"><%= cat %></span>
+          <% }); %>
+        </div>
+        <p class="tool-card-desc"><%= tool.description %></p>
+        <ul class="tool-card-features">
+          <% tool.features.forEach(function(f) { %>
+            <li><%= f %></li>
+          <% }); %>
+        </ul>
+        <div class="tool-card-tiers">
+          <% tool.tiers.forEach(function(t) { %>
+            <span class="tier-badge"><%= t %></span>
+          <% }); %>
+        </div>
+      </div>
+    <% }); %>
+  </div>
+
+  <div class="custom-integration">
+    <h3>Don't see what you need?</h3>
+    <p>We integrate anything with an API. Tell us what you use — chances are we can wire it in.</p>
+    <a href="/get-started" class="btn btn-gold">Request Custom Integration</a>
+  </div>
+</section>
+
+<script>
+  document.querySelectorAll('.filter-chip').forEach(function(chip) {
+    chip.addEventListener('click', function() {
+      document.querySelectorAll('.filter-chip').forEach(function(c) { c.classList.remove('active'); });
+      chip.classList.add('active');
+      var filter = chip.getAttribute('data-filter');
+      document.querySelectorAll('.tool-card').forEach(function(card) {
+        var cats = card.getAttribute('data-categories').split('|');
+        card.style.display = (filter === 'all' || cats.indexOf(filter) > -1) ? '' : 'none';
+      });
+    });
+  });
+</script>
+
+<%- include('partials/footer') %>

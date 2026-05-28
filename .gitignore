@@ -1,0 +1,21 @@
+﻿# Dependencies
+node_modules/
+
+# Logs
+*.log
+server.log
+
+# Environment files
+.env
+.env.local
+.env.*.local
+
+# Credential dump files — never commit
+*_vars.json
+sa_temp.json
+*credentials*.json
+*.key.json
+gorilla-real-estate-*.json
+deploy-make.js
+*.pem
+*.p12

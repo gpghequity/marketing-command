@@ -1,0 +1,25 @@
+<%- include('partials/header', { pageTitle: 'Login', bodyClass: 'page-login' }) %>
+
+<section class="login-shell">
+  <div class="login-card">
+    <div class="badge xl">MC</div>
+    <h1>Marketing Command</h1>
+    <p class="login-sub">Admin access</p>
+    <form method="POST" action="/login">
+      <% if (error) { %>
+        <div class="login-err"><%= error %></div>
+      <% } %>
+      <div class="field">
+        <label>Username</label>
+        <input type="text" name="username" required autofocus>
+      </div>
+      <div class="field">
+        <label>Password</label>
+        <input type="password" name="password" required>
+      </div>
+      <button type="submit" class="btn btn-gold btn-block btn-lg">Sign In</button>
+    </form>
+  </div>
+</section>
+
+<%- include('partials/footer') %>

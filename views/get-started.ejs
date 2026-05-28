@@ -1,0 +1,177 @@
+<%- include('partials/header', { pageTitle: 'Get Started', bodyClass: 'page-intake' }) %>
+
+<div class="page-header">
+  <div class="inner">
+    <h1>Let's build your stack.</h1>
+    <p class="sub">Answer a few questions. We'll reach out within one business day with a recommendation, timeline, and quote.</p>
+  </div>
+</div>
+
+<section class="intake-page">
+  <form class="intake-form" method="POST" action="/submit-intake">
+
+    <div class="form-section">
+      <h3>Section 1</h3>
+      <p>Your business</p>
+      <div class="field">
+        <label>First name <span class="req">*</span></label>
+        <input type="text" name="firstName" required>
+      </div>
+      <div class="field">
+        <label>Last name <span class="req">*</span></label>
+        <input type="text" name="lastName" required>
+      </div>
+      <div class="field">
+        <label>Email <span class="req">*</span></label>
+        <input type="email" name="email" required>
+      </div>
+      <div class="field">
+        <label>Phone <span class="req">*</span></label>
+        <input type="tel" name="phone" required>
+      </div>
+      <div class="field">
+        <label>Business name</label>
+        <input type="text" name="businessName">
+      </div>
+      <div class="field">
+        <label>Business type</label>
+        <select name="businessType">
+          <option value="">Select...</option>
+          <option>Solo Agent</option>
+          <option>Agent Team</option>
+          <option>Small Brokerage</option>
+          <option>Large Brokerage</option>
+          <option>Wholesaler</option>
+          <option>Investor</option>
+          <option>Lender</option>
+          <option>Property Manager</option>
+          <option>Other</option>
+        </select>
+      </div>
+      <div class="field">
+        <label>State / markets you operate in</label>
+        <input type="text" name="markets" placeholder="e.g. Texas - Austin Metro">
+      </div>
+      <div class="field">
+        <label>Years in business</label>
+        <input type="text" name="years">
+      </div>
+    </div>
+
+    <div class="form-section">
+      <h3>Section 2</h3>
+      <p>Your current stack</p>
+      <div class="field">
+        <label>What tools do you use today?</label>
+        <div class="checkbox-grid">
+          <% tools.forEach(function(tool) { %>
+            <label class="checkbox-label">
+              <input type="checkbox" name="currentTools" value="<%= tool.name %>">
+              <%= tool.name %> — <%= tool.tagline %>
+            </label>
+          <% }); %>
+          <label class="checkbox-label">
+            <input type="checkbox" name="currentTools" value="Other">
+            Other
+          </label>
+        </div>
+      </div>
+      <div class="field">
+        <label>Biggest pain point in your current stack</label>
+        <textarea name="painPoint" rows="3" placeholder="What is not working?"></textarea>
+      </div>
+      <div class="field">
+        <label>Monthly spend on current marketing tools</label>
+        <select name="currentSpend">
+          <option value="">Select...</option>
+          <option>Under $100</option>
+          <option>$100-300</option>
+          <option>$300-700</option>
+          <option>$700-1500</option>
+          <option>$1500+</option>
+        </select>
+      </div>
+    </div>
+
+    <div class="form-section">
+      <h3>Section 3</h3>
+      <p>Your goals</p>
+      <div class="field">
+        <label>What are you hoping Marketing Command solves?</label>
+        <div class="checkbox-grid">
+          <label class="checkbox-label"><input type="checkbox" name="goals" value="Set up tools faster"> Set up tools faster</label>
+          <label class="checkbox-label"><input type="checkbox" name="goals" value="One bill instead of six"> One bill instead of six</label>
+          <label class="checkbox-label"><input type="checkbox" name="goals" value="Get integrations actually working"> Get integrations actually working</label>
+          <label class="checkbox-label"><input type="checkbox" name="goals" value="Professional setup I can trust"> Professional setup I can trust</label>
+          <label class="checkbox-label"><input type="checkbox" name="goals" value="Team accounts under one roof"> Team accounts under one roof</label>
+          <label class="checkbox-label"><input type="checkbox" name="goals" value="Scale to more agents/team members"> Scale to more agents/team members</label>
+        </div>
+      </div>
+      <div class="field">
+        <label>Other goal (optional)</label>
+        <input type="text" name="otherGoal">
+      </div>
+    </div>
+
+    <div class="form-section">
+      <h3>Section 4</h3>
+      <p>Package interest</p>
+      <div class="field">
+        <label>Which package interests you most?</label>
+        <div class="radio-grid">
+          <label class="radio-label"><input type="radio" name="package" value="Starter"> Starter — $297/mo</label>
+          <label class="radio-label"><input type="radio" name="package" value="Growth"> Growth — $697/mo</label>
+          <label class="radio-label"><input type="radio" name="package" value="Team"> Team — $1,497/mo</label>
+          <label class="radio-label"><input type="radio" name="package" value="Enterprise"> Enterprise — Custom</label>
+          <label class="radio-label"><input type="radio" name="package" value="Not sure" checked> Not sure — recommend one</label>
+        </div>
+      </div>
+      <div class="field">
+        <label>When do you want to start?</label>
+        <div class="radio-grid">
+          <label class="radio-label"><input type="radio" name="timing" value="Immediately"> Immediately</label>
+          <label class="radio-label"><input type="radio" name="timing" value="Within 30 days"> Within 30 days</label>
+          <label class="radio-label"><input type="radio" name="timing" value="Within 90 days"> Within 90 days</label>
+          <label class="radio-label"><input type="radio" name="timing" value="Just exploring"> Just exploring</label>
+        </div>
+      </div>
+      <div class="field">
+        <label>Budget range per month</label>
+        <select name="budget">
+          <option value="">Select...</option>
+          <option>Under $300</option>
+          <option>$300-700</option>
+          <option>$700-1500</option>
+          <option>$1500-3000</option>
+          <option>$3000+</option>
+        </select>
+      </div>
+    </div>
+
+    <div class="form-section">
+      <h3>Section 5</h3>
+      <p>Anything else</p>
+      <div class="field">
+        <label>Anything you want us to know? (optional)</label>
+        <textarea name="notes" rows="4"></textarea>
+      </div>
+      <div class="field">
+        <label>How did you hear about Marketing Command?</label>
+        <select name="source">
+          <option value="">Select...</option>
+          <option>Referral</option>
+          <option>Google</option>
+          <option>Social</option>
+          <option>Podcast</option>
+          <option>Event</option>
+          <option>PwP Product</option>
+          <option>Other</option>
+        </select>
+      </div>
+    </div>
+
+    <button type="submit" class="btn btn-gold btn-block btn-lg">Send My Intake</button>
+  </form>
+</section>
+
+<%- include('partials/footer') %>
