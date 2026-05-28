@@ -114,7 +114,7 @@ let nextIntakeId = 4;
 // Daily email cap — 20 intake notification emails/day max
 let _mktDailySent = 0;
 let _mktDailyDate = '';
-const MKT_DAILY_CAP = 20;
+const MKT_DAILY_CAP = 6;
 function mktCapReached() {
   const today = new Date().toISOString().slice(0, 10);
   if (_mktDailyDate !== today) { _mktDailySent = 0; _mktDailyDate = today; }
