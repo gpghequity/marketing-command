@@ -150,6 +150,13 @@ app.get('/', (req, res) => {
   res.render('home');
 });
 
+// Owner Outreach Marketing Studio — self-contained acquisition-outreach tool
+// (MHP / MF / Storage / Laundromat / Car Wash mail-merge). Explicit route so it
+// serves reliably regardless of static-middleware ordering.
+app.get(['/owner-outreach-studio', '/owner-outreach-studio.html'], (req, res) => {
+  res.sendFile(path.join(__dirname, 'public', 'owner-outreach-studio.html'));
+});
+
 app.get('/tools', (req, res) => {
   res.render('tools', { tools: TOOLS_CATALOG });
 });
