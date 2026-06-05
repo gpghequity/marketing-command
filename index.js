@@ -297,6 +297,33 @@ app.post('/admin/intake/:id/status', requireAdmin, (req, res) => {
   res.redirect('/admin-dashboard');
 });
 
+// Additive, read-only status feed for the Franco HQ single-pane dashboard.
+// Counts and short labels only — no PII. Never throws.
+app.get('/api/hq', (req, res) => {
+  try {
+    const countBy = (s) => intakes.filter(i => i.status === s).length;
+    const thisWeek = intakes.filter(i => i.submittedAt.startsWith('Apr 17') || i.submittedAt.startsWith('Apr 16') || i.submittedAt.startsWith('Apr 15') || i.submittedAt.startsWith('Apr 14')).length;
+    const converted = intakes.filter(i => i.status === 'QUOTED' || i.status === 'CONVERTED').length;
+    const conversionPct = intakes.length ? Math.round((converted / intakes.length) * 100) : 0;
+    res.json({
+      ok: true,
+      service: 'Marketing Command',
+      intakes: {
+        total: intakes.length,
+        new: countBy('NEW'),
+        contacted: countBy('CONTACTED'),
+        quoted: countBy('QUOTED'),
+        converted: countBy('CONVERTED')
+      },
+      this_week: thisWeek,
+      conversion_pct: conversionPct,
+      time: new Date().toISOString()
+    });
+  } catch (e) {
+    res.json({ ok: false, error: String(e) });
+  }
+});
+
 app.get('/about', (req, res) => {
   res.render('about');
 });
