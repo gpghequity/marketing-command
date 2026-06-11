@@ -60,7 +60,10 @@ const intakes = [
     budget: '$700-1500',
     notes: 'We have 6 agents. Want everyone on one stack by Q3.',
     source: 'Referral',
-    submittedAt: 'Apr 17, 3:00 PM',
+    submittedAt: '2026-04-17T15:00:00Z',
+    submittedAtDisplay: 'Apr 17, 3:00 PM',
+    submittedAt: '2026-04-17T15:00:00Z',
+    submittedAtDisplay: 'Apr 17, 3:00 PM',
     status: 'NEW'
   },
   {
@@ -82,7 +85,8 @@ const intakes = [
     budget: '$300-700',
     notes: 'Solo wholesaler. Want to get started this week.',
     source: 'Podcast',
-    submittedAt: 'Apr 17, 11:00 AM',
+    submittedAt: '2026-04-17T11:00:00Z',
+    submittedAtDisplay: 'Apr 17, 11:00 AM',
     status: 'CONTACTED'
   },
   {
@@ -104,7 +108,8 @@ const intakes = [
     budget: '$1500-3000',
     notes: 'Team of 9 agents plus a TC. Want to migrate everything by end of quarter.',
     source: 'PwP Product',
-    submittedAt: 'Apr 16, 5:00 PM',
+    submittedAt: '2026-04-16T17:00:00Z',
+    submittedAtDisplay: 'Apr 16, 5:00 PM',
     status: 'QUOTED'
   }
 ];
@@ -198,7 +203,8 @@ app.post('/submit-intake', async (req, res) => {
     budget: b.budget || '',
     notes: b.notes || '',
     source: b.source || '',
-    submittedAt: new Date().toLocaleString('en-US', { month: 'short', day: 'numeric', hour: 'numeric', minute: '2-digit' }),
+    submittedAt: new Date().toISOString(),
+    submittedAtDisplay: new Date().toLocaleString('en-US', { month: 'short', day: 'numeric', hour: 'numeric', minute: '2-digit' }),
     status: 'NEW'
   };
   intakes.unshift(intake);
@@ -253,6 +259,11 @@ app.post('/submit-intake', async (req, res) => {
 
 app.get('/thank-you', (req, res) => {
   res.render('thank-you');
+});
+
+// API endpoint for unified digest (Franco pulls intakes from here)
+app.get('/api/intakes', (req, res) => {
+  res.json({ ok: true, intakes });
 });
 
 app.get('/login', (req, res) => {
