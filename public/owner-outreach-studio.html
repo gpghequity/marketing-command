@@ -40,11 +40,26 @@
   <!-- LEFT: controls -->
   <div>
     <div class="card">
-      <h2>1 · Target &amp; channel</h2>
-      <label>What are you buying?</label>
-      <select id="asset"></select>
+      <h2>1 · Who & what you're asking</h2>
+      <label>Contact category</label>
+      <select id="contactCategory">
+        <option value="">— Choose category —</option>
+        <option value="agents">Real Estate Agents</option>
+        <option value="brokers">Brokers</option>
+        <option value="ce_coaches">CE Coaches</option>
+        <option value="storage_owners">Storage Owners</option>
+        <option value="mhp_owners">MHP Owners</option>
+        <option value="other">Other</option>
+      </select>
+      <label>What are you asking for?</label>
+      <select id="ask" style="display:none">
+        <option value="">— Choose what you want from them —</option>
+      </select>
+      <p id="askHint" class="muted" style="margin:6px 0;font-size:11px;display:none"></p>
+
       <label>How to reach them?</label>
       <select id="channel"><option value="email">Email draft (mail-merge)</option><option value="call">Phone / voice script</option></select>
+
       <label>Your sign-off name</label>
       <input id="sender" value="Steve · Gorilla Realty">
       <label>Your callback number</label>
@@ -171,6 +186,105 @@ function gen(){
 }
 function copyAll(){if(!DRAFTS.length)return;navigator.clipboard.writeText(DRAFTS.join('\n')).then(()=>alert('Copied '+DRAFTS.length+' drafts to clipboard'));}
 function download(){if(!DRAFTS.length)return;const b=new Blob([DRAFTS.join('\n')],{type:'text/plain'});const a=document.createElement('a');a.href=URL.createObjectURL(b);a.download='outreach_drafts.txt';a.click();}
+
+// Contact category → what you're asking FOR
+const ASKS = {
+  agents: [
+    { value: 'list_with_us', label: 'List properties with us', hint: 'Positioning as buyer\'s agent or broker' },
+    { value: 'send_deals', label: 'Send us off-market deals', hint: 'Direct wholesaler outreach' },
+    { value: 'partner', label: 'Partnership opportunity', hint: 'Co-brokerage or referral' },
+    { value: 'training', label: 'Attend our training', hint: 'CE credit or sales training' }
+  ],
+  brokers: [
+    { value: 'network', label: 'Join our broker network', hint: 'Multi-broker partnership' },
+    { value: 'deals', label: 'Send us deals', hint: 'Wholesale or direct investment' },
+    { value: 'training', label: 'Training/coaching', hint: 'Team development' },
+    { value: 'partnership', label: 'Strategic partnership', hint: 'Co-brokerage or JV' }
+  ],
+  ce_coaches: [
+    { value: 'teach_system', label: 'Teach our system to your students', hint: 'Revenue share on CE courses' },
+    { value: 'partnership', label: 'Co-training partnership', hint: 'Joint course development' },
+    { value: 'resell', label: 'Resell our training', hint: 'White-label option' }
+  ],
+  storage_owners: [
+    { value: 'buy', label: 'Buy your facility', hint: 'Direct acquisition offer' },
+    { value: 'management', label: 'Manage your property', hint: 'Professional management' },
+    { value: 'expand', label: 'Partner on expansion', hint: 'Development partnership' }
+  ],
+  mhp_owners: [
+    { value: 'buy', label: 'Buy your park', hint: 'Cash offer' },
+    { value: 'management', label: 'Manage/acquire', hint: 'Passive income opportunity' },
+    { value: 'partnership', label: 'Growth partnership', hint: 'Development collaboration' }
+  ],
+  other: [
+    { value: 'custom', label: 'Custom message', hint: 'Write your own' }
+  ]
+};
+
+// ASK TEMPLATES (generated per category + ask)
+const ASK_TEMPLATES = {
+  agents_list_with_us: {
+    subject: 'Listing opportunity in {{city}}, {{state}}',
+    body: "Hi {{owner_first}},\n\nQuick note — we work with sellers in {{city}}, {{state}} who want a faster, more certain sale. {{company}} has a strong reputation and we'd love to have you as our listing agent on a recent acquisition.\n\nWorth a brief call to discuss?\n\n{{sender}}\n{{phone}}"
+  },
+  agents_send_deals: {
+    subject: 'Off-market deals for your buyers',
+    body: "Hi {{owner_first}},\n\nI work with active buyers in {{state}} looking for investment properties. We handle the rehab and hold, so we buy before retail appreciation. If you have buyers fitting that profile, I'd love to be a source for you.\n\nOpen to a quick conversation?\n\n{{sender}}\n{{phone}}"
+  },
+  brokers_network: {
+    subject: 'Broker network opportunity — {{state}}',
+    body: "Hi {{owner_first}},\n\nWe're building a broker network across {{state}} for off-market deals and wholesale. {{company}} would be a strong fit. We'd connect your buyers with our deals, and split commissions 50/50.\n\nWorth exploring?\n\n{{sender}}\n{{phone}}"
+  },
+  ce_coaches_teach_system: {
+    subject: 'CE partnership opportunity',
+    body: "Hi {{owner_first}},\n\nWe've built a real estate investment system that gets strong reviews. {{company}} could offer it as a CE course + keep 30% of revenue. No upfront cost, minimal setup.\n\nInterested in a partnership conversation?\n\n{{sender}}\n{{phone}}"
+  },
+  storage_owners_buy: {
+    subject: 'Acquisition offer for {{company}}',
+    body: "Hi {{owner_first}},\n\nWe acquire self-storage facilities in {{city}}, {{state}}. {{company}} is on our shortlist. We can close with cash in 30-45 days with no contingencies.\n\nWould you consider an offer?\n\n{{sender}}\n{{phone}}"
+  },
+  mhp_owners_buy: {
+    subject: 'Acquisition interest — {{company}}',
+    body: "Hi {{owner_first}},\n\nWe buy mobile home parks in {{state}}. {{company}} in {{city}} came up in our search. We move fast with cash and can handle everything.\n\nOpen to a discussion?\n\n{{sender}}\n{{phone}}"
+  }
+};
+
+document.getElementById('contactCategory').onchange = e => {
+  const cat = e.target.value;
+  const askSel = document.getElementById('ask');
+  const hint = document.getElementById('askHint');
+  askSel.innerHTML = '<option value="">— Choose what you want —</option>';
+  if (cat && ASKS[cat]) {
+    ASKS[cat].forEach(a => {
+      const o = document.createElement('option');
+      o.value = a.value;
+      o.textContent = a.label;
+      o.dataset.hint = a.hint;
+      askSel.appendChild(o);
+    });
+    askSel.style.display = 'block';
+    hint.style.display = 'block';
+  } else {
+    askSel.style.display = 'none';
+    hint.style.display = 'none';
+  }
+};
+
+document.getElementById('ask').onchange = e => {
+  const hint = document.getElementById('askHint');
+  hint.textContent = e.target.options[e.target.selectedIndex].dataset.hint || '';
+  if (e.target.value) generateMessageFromAsk();
+};
+
+function generateMessageFromAsk() {
+  const cat = document.getElementById('contactCategory').value;
+  const ask = document.getElementById('ask').value;
+  if (!cat || !ask) return;
+  const key = cat + '_' + ask;
+  const tpl = ASK_TEMPLATES[key] || ASK_TEMPLATES.storage_owners_buy; // fallback
+  document.getElementById('subject').value = tpl.subject;
+  document.getElementById('body').value = tpl.body;
+}
 
 // Scraper integration
 const SCRAPER_URL = 'https://rei-email-scraper-production.up.railway.app';
