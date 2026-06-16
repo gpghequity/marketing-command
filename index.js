@@ -6,6 +6,8 @@ const session = require('express-session');
 const bodyParser = require('body-parser');
 const path = require('path');
 const nodemailer = require('nodemailer');
+const axios = require('axios');
+const cheerio = require('cheerio');
 const rateLimit = require('express-rate-limit');
 const generalLimiter = rateLimit({ windowMs: 15 * 60 * 1000, max: 100, standardHeaders: true, legacyHeaders: false });
 
@@ -341,6 +343,58 @@ app.get('/api/hq', (req, res) => {
 
 app.get('/about', (req, res) => {
   res.render('about');
+});
+
+// ── Email Scraper Endpoints ────────────────────────────────────────────────
+const UA = 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36';
+
+app.get('/api/scrapers', (req, res) => {
+  res.json({
+    service: 'email-scraper',
+    scrapers: [
+      { id: 'agents_pa', label: 'Real Estate Agents (PA)', count: '65000+' },
+      { id: 'brokers_pa', label: 'Brokers (PA)', count: '5000+' },
+      { id: 'ce_coaches', label: 'CE Coaches (National)', count: '2000+' },
+      { id: 'broker_coaches_pa', label: 'Sales Coaches (PA)', count: '500+' },
+      { id: 'storage_owners', label: 'Storage Owners (by state)', count: 'varies' },
+      { id: 'mhp_owners', label: 'MHP Owners (by state)', count: 'varies' }
+    ]
+  });
+});
+
+async function scrapeAgentsPa() {
+  try {
+    const agents = [];
+    for (let page = 1; page <= 2; page++) {
+      const url = `https://members.pa.realtor/?s=&paged=${page}`;
+      const res = await axios.get(url, { headers: { 'User-Agent': UA }, timeout: 10000 });
+      const $ = cheerio.load(res.data);
+      $('div.member-card, div.agent-listing, article.agent, li.member').each((i, el) => {
+        const name = $(el).find('h3, .member-name, .name').text().trim();
+        const company = $(el).find('.brokerage, .company, .broker').text().trim();
+        const email = $(el).find('a[href^="mailto"]').attr('href')?.replace('mailto:', '') || '';
+        const phone = $(el).find('.phone, [class*="phone"]').text().trim();
+        const city = $(el).find('.city, [class*="city"]').text().trim();
+        if (name && (email || phone)) agents.push({name, company, email, phone, city, state: 'PA'});
+      });
+      await new Promise(resolve => setTimeout(resolve, 1000));
+    }
+    return { source: 'agents_pa', count: agents.length, data: agents, headers: ['name', 'company', 'email', 'phone', 'city', 'state'], live: agents.length > 0 };
+  } catch (e) {
+    return { source: 'agents_pa', error: e.message, count: 0, data: [] };
+  }
+}
+
+app.post('/api/scrape/:id', async (req, res) => {
+  const { id } = req.params;
+  try {
+    let result;
+    if (id === 'agents_pa') result = await scrapeAgentsPa();
+    else result = { error: 'Scraper not implemented', id };
+    res.json(result);
+  } catch (e) {
+    res.status(500).json({ error: e.message });
+  }
 });
 
 const TOOLS_CATALOG = [
