@@ -18,15 +18,16 @@
   label{display:block;font-size:11px;font-weight:700;color:var(--ink);text-transform:uppercase;letter-spacing:.03em;margin:10px 0 3px}
   select,input,textarea{width:100%;padding:8px 10px;border:1px solid var(--line);border-radius:6px;font:inherit;background:#fff}
   textarea{min-height:120px;font-family:ui-monospace,Consolas,monospace;font-size:12px}
-  button{padding:9px 16px;background:var(--gold);color:var(--navy);border:0;border-radius:6px;font-weight:700;cursor:pointer}
-  button.ghost{background:#fff;border:1px solid var(--navy);color:var(--navy)}
+  button{padding:9px 16px;background:var(--gold);color:var(--navy);border:0;border-radius:6px;font-weight:700;cursor:pointer;margin-top:8px}
+  button.ghost{background:#fff;border:1px solid var(--navy);color:var(--navy)}button:disabled{opacity:.5;cursor:not-allowed}
   .muted{color:#6b7280;font-size:12px}
   .draft{border:1px solid var(--line);border-radius:8px;padding:10px 12px;margin-bottom:10px;background:#fff}
   .draft .to{font-size:12px;color:var(--navy);font-weight:700}
   .draft pre{white-space:pre-wrap;font:13px/1.5 -apple-system,Segoe UI,Arial,sans-serif;margin:6px 0 0;color:var(--ink)}
   .pill{display:inline-block;background:#eef1f7;border-radius:10px;padding:1px 8px;font-size:11px;color:var(--navy);margin-left:6px}
   ol{margin:6px 0 0 18px;padding:0}ol li{margin-bottom:4px;font-size:13px}
-  .row{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+  .row{display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin-top:8px}
+  .hint{color:#999;font-size:11px;margin-top:4px}
 </style>
 </head>
 <body>
@@ -40,69 +41,61 @@
   <!-- LEFT: controls -->
   <div>
     <div class="card">
-      <h2>1 · Who & what you're asking</h2>
-      <label>Contact category</label>
-      <select id="contactCategory">
-        <option value="">— Choose category —</option>
-        <option value="agents">Real Estate Agents</option>
-        <option value="brokers">Brokers</option>
-        <option value="ce_coaches">CE Coaches</option>
-        <option value="storage_owners">Storage Owners</option>
-        <option value="mhp_owners">MHP Owners</option>
-        <option value="other">Other</option>
+      <h2>1 · What you're asking for</h2>
+      <label>Asset type & ask</label>
+      <select id="asset" onchange="onAssetChange()">
+        <option value="">— Choose asset type —</option>
+        <option value="mhp">Mobile Home Parks (Buy)</option>
+        <option value="mf">Multifamily Buildings (Buy)</option>
+        <option value="storage">Self-Storage Facilities (Buy)</option>
+        <option value="laundromat">Laundromats (Buy)</option>
+        <option value="carwash">Car Washes (Buy)</option>
       </select>
-      <label>What are you asking for?</label>
-      <select id="ask" style="display:none">
-        <option value="">— Choose what you want from them —</option>
-      </select>
-      <p id="askHint" class="muted" style="margin:6px 0;font-size:11px;display:none"></p>
+      <p class="hint" id="assetHint"></p>
 
       <label>How to reach them?</label>
-      <select id="channel"><option value="email">Email draft (mail-merge)</option><option value="call">Phone / voice script</option></select>
-
-      <label>Your sign-off name</label>
-      <input id="sender" value="Steve · Gorilla Realty">
-      <label>Your callback number</label>
-      <input id="senderphone" value="(570) 798-7051">
+      <select id="channel"><option value="email">Email draft</option><option value="call">Phone script</option></select>
     </div>
 
     <div class="card">
       <h2>2 · Get your contact list</h2>
-      <p class="muted">Pick one: auto-scrape by category, upload a file, or paste CSV. Recognized columns: <code>owner_name, company, email, phone, city, state, address</code>.</p>
+      <p class="muted">Auto-scrape a category, upload CSV, or paste.</p>
 
-      <div style="margin-bottom:14px;padding:10px;background:#f0f4f8;border-radius:6px">
-        <label style="margin-bottom:8px">Auto-scrape by category</label>
-        <select id="scraper" style="margin-bottom:8px">
-          <option value="">— Choose a category —</option>
-          <option value="ce_coaches">CE Coaches (national)</option>
-          <option value="broker_coaches_pa">Broker/Sales Coaches (PA)</option>
-          <option value="agents_pa">Real Estate Agents (PA)</option>
-          <option value="brokers_pa">Brokers (PA)</option>
-          <option value="storage_owners">Storage Owners (by state)</option>
-          <option value="mhp_owners">MHP Owners (by state)</option>
-        </select>
-        <label id="stateLabel" style="display:none;margin-top:8px;margin-bottom:3px">States (PA,OH,NY)</label>
-        <input id="states" type="text" placeholder="PA,OH,NY" style="display:none;margin-bottom:8px">
-        <button onclick="triggerScraper()" style="width:100%">Scrape list →</button>
-        <p id="scrapeStatus" class="muted" style="margin:6px 0 0"></p>
-      </div>
+      <label style="margin-bottom:6px">Auto-scrape by category</label>
+      <select id="scraper" style="margin-bottom:8px">
+        <option value="">— Choose category —</option>
+        <option value="agents_pa">Real Estate Agents (PA)</option>
+        <option value="brokers_pa">Brokers (PA)</option>
+        <option value="ce_coaches">CE Coaches (national)</option>
+        <option value="broker_coaches_pa">Sales Coaches (PA)</option>
+        <option value="storage_owners">Storage Owners (by state)</option>
+        <option value="mhp_owners">MHP Owners (by state)</option>
+      </select>
+      <label id="stateLabel" style="display:none;margin-bottom:3px">States (comma-separated)</label>
+      <input id="states" type="text" placeholder="PA,OH,NY" style="display:none;margin-bottom:8px">
+      <button onclick="triggerScraper()" style="width:100%">Scrape list →</button>
+      <p id="scrapeStatus" class="muted"></p>
 
-      <p style="margin:8px 0;text-align:center;color:#999">or</p>
+      <p style="margin:12px 0 8px;text-align:center;color:#999">or</p>
 
-      <label>Upload CSV file</label>
-      <input type="file" id="file" accept=".csv,.txt" style="margin-bottom:8px">
+      <label>Upload CSV</label>
+      <input type="file" id="file" accept=".csv,.txt" style="margin-bottom:12px">
 
-      <label>Or paste CSV here</label>
+      <label>Or paste CSV</label>
       <textarea id="csv" placeholder="owner_name,company,email,phone,city,state&#10;Amanda Ritchie,Bolt Storage,amanda@boltstorage.com,(575) 442-2616,Ithaca,NY"></textarea>
     </div>
 
     <div class="card">
-      <h2>3 · Message template <span class="muted">(editable)</span></h2>
-      <label>Subject</label>
+      <h2>3 · Customize message</h2>
+      <label>Your name & sign-off</label>
+      <input id="sender" value="Steve · Gorilla Realty">
+      <label>Your callback number</label>
+      <input id="senderphone" value="(570) 798-7051">
+      <label style="margin-top:12px">Subject line</label>
       <input id="subject">
-      <label>Body — use {{owner_first}} {{company}} {{city}} {{state}} {{sender}} {{phone}}</label>
+      <label>Body (use {{owner_first}} {{company}} {{city}} {{state}})</label>
       <textarea id="body"></textarea>
-      <div class="row" style="margin-top:10px">
+      <div class="row">
         <button onclick="gen()">Generate drafts →</button>
         <button class="ghost" onclick="resetTpl()">Reset template</button>
       </div>
@@ -114,12 +107,12 @@
     <div class="card">
       <h2>How it works</h2>
       <ol>
-        <li><b>Pick your target:</b> Asset type (MHP, storage, etc) → template auto-loads acquisition copy.</li>
-        <li><b>Get contacts:</b> Scrape by category, upload CSV, or paste. Template auto-fills merge fields.</li>
-        <li><b>Customize:</b> Tweak subject/body. Preview uses actual contact data.</li>
-        <li><b>Generate:</b> Click → personalized drafts. Copy all or download, then paste into Gmail/GHL/Franco.</li>
+        <li><b>Pick asset type:</b> MHP, storage, multifamily, laundromat, or car wash. Template auto-loads.</li>
+        <li><b>Get contacts:</b> Scrape category, upload CSV, or paste. One of the three.</li>
+        <li><b>Customize:</b> Edit subject/body. Merge fields auto-fill from your contact data.</li>
+        <li><b>Generate:</b> One click → personalized drafts. Copy all or download. Paste into email/GHL/Franco.</li>
       </ol>
-      <p class="muted" style="margin-top:8px">Drafts only. You review before sending. (Compliance: include opt-out, contact business owners only.)</p>
+      <p class="muted" style="margin-top:8px">Drafts only. You review before sending. Compliance: business owners only, include opt-out.</p>
     </div>
     <div class="card">
       <h2>Drafts <span id="count" class="pill">0</span></h2>
@@ -134,181 +127,138 @@
 </div></div>
 
 <script>
-// Per-asset acquisition templates. Email = short, owner-direct, broker-honest.
-const TEMPLATES = {
-  mhp:{label:'Mobile Home Park',email:{subject:'Quick question about {{company}}',body:"Hi {{owner_first}},\n\nShort note — I'm with Storage Guys LLC and we acquire mobile home parks. {{company}} in {{city}}, {{state}} is on our shortlist. Would you (or the ownership group) consider an offer?\n\nWe can move quickly with cash, and because we're also licensed brokers we can lay out a listing option if that fits better. No pressure either way — just reaching out to owners directly.\n\nWorth a 10-minute call?\n\n{{sender}}\nStorage Guys LLC\n{{phone}}"},
-    call:"Hi, this is {{sender}} with Storage Guys LLC — I'll keep it short. We buy mobile home parks and {{company}} in {{city}} is on our shortlist. Any interest in an offer? We can do cash and quick, or a listing option since we're also licensed brokers. Is there a better number for the owner, or could we talk for 10 minutes?"},
-  mf:{label:'Multifamily',email:{subject:'Quick question about your {{city}} building',body:"Hi {{owner_first}},\n\nWe acquire multifamily in {{city}}, {{state}} and {{company}} caught our eye. Would you consider an offer?\n\nWe close fast with cash, and as licensed brokers we can also show you a listing option. Just reaching out to owners directly — no pressure.\n\nOpen to a quick call?\n\n{{sender}}\n{{phone}}"},
-    call:"Hi, this is {{sender}}. Quick one — we buy multifamily in {{city}} and your building came up. Any interest in an offer? Cash and quick, or a listing option since we're licensed brokers. Could we talk 10 minutes?"},
-  storage:{label:'Self Storage',email:{subject:'Quick question about {{company}} in {{city}}',body:"Hi {{owner_first}},\n\nI'll keep this short — I'm with Storage Guys LLC and we're acquiring a few self-storage facilities this year. {{company}} in {{city}}, {{state}} is on our shortlist. Would the ownership group consider an offer?\n\nWe move quickly with cash, and as licensed brokers we can lay out a listing option too. Reaching out to owners directly.\n\nWorth 10 minutes?\n\n{{sender}}\nStorage Guys LLC\n{{phone}}"},
-    call:"Hi, this is {{sender}} with Storage Guys LLC. Short question — we're buying self-storage and {{company}} in {{city}} is on our list. Any interest in an offer? Cash and quick, or a listing option. Better number for the owner, or can we talk 10 minutes?"},
-  laundromat:{label:'Laundromat',email:{subject:'Interested in your laundromat in {{city}}?',body:"Hi {{owner_first}},\n\nWe acquire laundromats and the one in {{city}}, {{state}} ({{company}}) is on our shortlist. Would you consider selling?\n\nWe can move quickly with cash, and as licensed brokers we can also walk you through a listing option. Just reaching out to owners directly.\n\nOpen to a quick call?\n\n{{sender}}\n{{phone}}"},
-    call:"Hi, this is {{sender}}. Quick one — we buy laundromats and {{company}} in {{city}} came up. Any interest in selling? Cash and quick, or a listing option since we're brokers. Could we talk for a few minutes?"},
-  carwash:{label:'Car Wash',email:{subject:'Quick question about {{company}}',body:"Hi {{owner_first}},\n\nWe acquire car washes and {{company}} in {{city}}, {{state}} is on our shortlist. Would you consider an offer?\n\nWe close fast with cash, and as licensed brokers we can also lay out a listing option. Reaching out to owners directly — no pressure.\n\nWorth a 10-minute call?\n\n{{sender}}\n{{phone}}"},
-    call:"Hi, this is {{sender}}. Short question — we buy car washes and {{company}} in {{city}} is on our list. Any interest in an offer? Cash and quick, or a listing option. Can we talk for a few minutes?"}
+const TEMPLATES={
+  mhp:{label:'Mobile Home Park',email:{subject:'Quick question about {{company}}',body:"Hi {{owner_first}},\n\nShort note — I'm with Storage Guys LLC and we acquire mobile home parks. {{company}} in {{city}}, {{state}} is on our shortlist. Would you (or the ownership group) consider an offer?\n\nWe can move quickly with cash, and because we're also licensed brokers we can lay out a listing option if that fits better. No pressure either way — just reaching out to owners directly.\n\nWorth a 10-minute call?\n\n{{sender}}\nStorage Guys LLC\n{{phone}}"},call:"Hi, this is {{sender}} with Storage Guys LLC — I'll keep it short. We buy mobile home parks and {{company}} in {{city}} is on our shortlist. Any interest in an offer? We can do cash and quick, or a listing option since we're also licensed brokers. Is there a better number for the owner, or could we talk for 10 minutes?"},
+  mf:{label:'Multifamily',email:{subject:'Quick question about your {{city}} building',body:"Hi {{owner_first}},\n\nWe acquire multifamily in {{city}}, {{state}} and {{company}} caught our eye. Would you consider an offer?\n\nWe close fast with cash, and as licensed brokers we can also show you a listing option. Just reaching out to owners directly — no pressure.\n\nOpen to a quick call?\n\n{{sender}}\n{{phone}}"},call:"Hi, this is {{sender}}. Quick one — we buy multifamily in {{city}} and your building came up. Any interest in an offer? Cash and quick, or a listing option since we're licensed brokers. Could we talk 10 minutes?"},
+  storage:{label:'Self Storage',email:{subject:'Quick question about {{company}} in {{city}}',body:"Hi {{owner_first}},\n\nI'll keep this short — I'm with Storage Guys LLC and we're acquiring a few self-storage facilities this year. {{company}} in {{city}}, {{state}} is on our shortlist. Would the ownership group consider an offer?\n\nWe move quickly with cash, and as licensed brokers we can lay out a listing option too. Reaching out to owners directly.\n\nWorth 10 minutes?\n\n{{sender}}\nStorage Guys LLC\n{{phone}}"},call:"Hi, this is {{sender}} with Storage Guys LLC. Short question — we're buying self-storage and {{company}} in {{city}} is on our list. Any interest in an offer? Cash and quick, or a listing option. Better number for the owner, or can we talk 10 minutes?"},
+  laundromat:{label:'Laundromat',email:{subject:'Interested in your laundromat in {{city}}?',body:"Hi {{owner_first}},\n\nWe acquire laundromats and the one in {{city}}, {{state}} ({{company}}) is on our shortlist. Would you consider selling?\n\nWe can move quickly with cash, and as licensed brokers we can also walk you through a listing option. Just reaching out to owners directly.\n\nOpen to a quick call?\n\n{{sender}}\n{{phone}}"},call:"Hi, this is {{sender}}. Quick one — we buy laundromats and {{company}} in {{city}} came up. Any interest in selling? Cash and quick, or a listing option since we're brokers. Could we talk for a few minutes?"},
+  carwash:{label:'Car Wash',email:{subject:'Quick question about {{company}}',body:"Hi {{owner_first}},\n\nWe acquire car washes and {{company}} in {{city}}, {{state}} is on our shortlist. Would you consider an offer?\n\nWe close fast with cash, and as licensed brokers we can also lay out a listing option. Reaching out to owners directly — no pressure.\n\nWorth a 10-minute call?\n\n{{sender}}\n{{phone}}"},call:"Hi, this is {{sender}}. Short question — we buy car washes and {{company}} in {{city}} is on our list. Any interest in an offer? Cash and quick, or a listing option. Can we talk for a few minutes?"}
 };
-const assetSel=document.getElementById('asset');
-Object.entries(TEMPLATES).forEach(([k,v])=>{const o=document.createElement('option');o.value=k;o.textContent=v.label;assetSel.appendChild(o);});
 
-function curTpl(){const a=TEMPLATES[assetSel.value];const ch=document.getElementById('channel').value;return ch==='call'?{subject:'(phone call — no subject)',body:a.call}:a.email;}
-function resetTpl(){const t=curTpl();document.getElementById('subject').value=t.subject;document.getElementById('body').value=t.body;}
-assetSel.onchange=resetTpl;document.getElementById('channel').onchange=resetTpl;resetTpl();
+function onAssetChange(){
+  const asset=document.getElementById('asset').value;
+  if(asset && TEMPLATES[asset]){
+    document.getElementById('assetHint').textContent=`Acquisition outreach: ${TEMPLATES[asset].label}`;
+    resetTpl();
+  }
+}
 
-document.getElementById('file').onchange=e=>{const f=e.target.files[0];if(!f)return;const r=new FileReader();r.onload=()=>document.getElementById('csv').value=r.result;r.readAsText(f);};
+function resetTpl(){
+  const asset=document.getElementById('asset').value;
+  const channel=document.getElementById('channel').value;
+  if(asset && TEMPLATES[asset] && TEMPLATES[asset][channel]){
+    const t=TEMPLATES[asset][channel];
+    document.getElementById('subject').value=t.subject||'';
+    document.getElementById('body').value=t.body||'';
+  }else{
+    document.getElementById('subject').value='';
+    document.getElementById('body').value='';
+  }
+}
+
+document.getElementById('channel').addEventListener('change',resetTpl);
+
+function triggerScraper(){
+  const cat=document.getElementById('scraper').value;
+  if(!cat){alert('Choose a category');return}
+  if(['storage_owners','mhp_owners'].includes(cat)){
+    const states=document.getElementById('states').value.trim();
+    if(!states){alert('Enter states (PA,OH,NY)');return}
+  }
+  document.getElementById('scrapeStatus').textContent='Scraping... (this is a placeholder until the scraper deploys)';
+  setTimeout(()=>{
+    document.getElementById('scrapeStatus').textContent='Scraper is currently offline. Paste CSV manually or upload a file.';
+  },1500);
+}
+
+document.getElementById('scraper').addEventListener('change',()=>{
+  const cat=document.getElementById('scraper').value;
+  const show=['storage_owners','mhp_owners'].includes(cat);
+  document.getElementById('stateLabel').style.display=show?'block':'none';
+  document.getElementById('states').style.display=show?'block':'none';
+});
+
+document.getElementById('file').addEventListener('change',(e)=>{
+  const f=e.target.files[0];
+  if(!f)return;
+  const r=new FileReader();
+  r.onload=(ev)=>{
+    document.getElementById('csv').value=ev.target.result;
+  };
+  r.readAsText(f);
+});
 
 function parseCSV(text){
-  const lines=text.trim().split(/\r?\n/).filter(x=>x.trim());if(lines.length<2)return[];
-  const split=l=>{const out=[],re=/("([^"]*(""[^"]*)*)"|[^,]*)(,|$)/g;let m;while((m=re.exec(l))){out.push((m[2]!==undefined?m[2].replace(/""/g,'"'):m[1]).trim());if(m[4]==='')break;}return out;};
-  const hdr=split(lines[0]).map(h=>h.toLowerCase().replace(/[^a-z0-9]/g,'_'));
-  const find=(...names)=>{for(const n of names){const i=hdr.indexOf(n);if(i>=0)return i;}return -1;};
-  const I={owner:find('owner_name','owner','name','first_name','contact'),company:find('company','facility_name','facility','business','name'),
-    email:find('owner_email','email','e_mail'),phone:find('owner_phone','phone','telephone'),city:find('city','mailing_city'),state:find('state','mailing_state'),addr:find('address','full_address','mailing_address')};
-  return lines.slice(1).map(split).map(c=>({owner:c[I.owner]||'',company:c[I.company]||'',email:c[I.email]||'',phone:c[I.phone]||'',city:c[I.city]||'',state:c[I.state]||'',addr:c[I.addr]||''})).filter(r=>r.company||r.owner||r.email||r.phone);
+  const lines=text.trim().split('\n');
+  if(lines.length<2)return[];
+  const h=lines[0].split(',').map(s=>s.trim().toLowerCase());
+  const rows=[];
+  for(let i=1;i<lines.length;i++){
+    const cells=lines[i].split(',').map(s=>s.trim());
+    const obj={};
+    h.forEach((k,j)=>{obj[k]=cells[j]||''});
+    if(obj.owner_name || obj.email)rows.push(obj);
+  }
+  return rows;
 }
-function firstName(n){n=(n||'').trim();if(!n||n.toLowerCase()==='n/a')return 'there';return n.split(/\s+/)[0];}
-function merge(t,r){const ctx={owner_first:firstName(r.owner),company:r.company||'your facility',city:r.city||'your area',state:r.state||'',sender:document.getElementById('sender').value,phone:document.getElementById('senderphone').value};return t.replace(/{{(\w+)}}/g,(_,k)=>ctx[k]!==undefined?ctx[k]:('{{'+k+'}}'));}
 
-let DRAFTS=[];
+function merge(tpl,data){
+  let r=tpl;
+  r=r.replace(/{{owner_first}}/g,(data.owner_name||'').split(' ')[0]);
+  r=r.replace(/{{company}}/g,data.company||'');
+  r=r.replace(/{{city}}/g,data.city||'');
+  r=r.replace(/{{state}}/g,data.state||'');
+  r=r.replace(/{{sender}}/g,document.getElementById('sender').value);
+  r=r.replace(/{{phone}}/g,document.getElementById('senderphone').value);
+  return r;
+}
+
 function gen(){
-  const rows=parseCSV(document.getElementById('csv').value);
-  const subT=document.getElementById('subject').value,bodT=document.getElementById('body').value;
-  const out=document.getElementById('out');out.innerHTML='';DRAFTS=[];
-  if(!rows.length){out.innerHTML='<p class="muted">No rows parsed — check your CSV has a header row and at least one lead.</p>';document.getElementById('count').textContent='0';return;}
+  const asset=document.getElementById('asset').value;
+  const channel=document.getElementById('channel').value;
+  if(!asset){alert('Pick asset type');return}
+  const csv=document.getElementById('csv').value;
+  if(!csv.trim()){alert('Paste or upload a CSV');return}
+  const rows=parseCSV(csv);
+  if(!rows.length){alert('No valid rows in CSV');return}
+  const subject=document.getElementById('subject').value;
+  const body=document.getElementById('body').value;
+  if(!subject || !body){alert('Fill in subject and body');return}
+
+  const out=document.getElementById('out');
+  out.innerHTML='';
   rows.forEach(r=>{
-    const sub=merge(subT,r),bod=merge(bodT,r);
-    const to=r.email||r.phone||'(no contact)';
-    DRAFTS.push(`TO: ${to}${r.company?'  ['+r.company+(r.city?' — '+r.city:'')+']':''}\nSUBJECT: ${sub}\n\n${bod}\n\n----------------------------------------`);
-    const d=document.createElement('div');d.className='draft';
-    d.innerHTML=`<div class="to">${to}${r.company?' · '+r.company:''}${r.city?' · '+r.city+(r.state?', '+r.state:''):''}</div><div class="muted">Subject: ${sub.replace(/</g,'&lt;')}</div><pre>${bod.replace(/</g,'&lt;')}</pre>`;
+    const s=merge(subject,r);
+    const b=merge(body,r);
+    const d=document.createElement('div');
+    d.className='draft';
+    d.innerHTML=`<div class="to">To: ${r.owner_name||'(no name)'} ${r.email?`&lt;${r.email}&gt;`:''}</div><pre><b>${s}</b>\n\n${b}</pre>`;
     out.appendChild(d);
   });
   document.getElementById('count').textContent=rows.length;
 }
-function copyAll(){if(!DRAFTS.length)return;navigator.clipboard.writeText(DRAFTS.join('\n')).then(()=>alert('Copied '+DRAFTS.length+' drafts to clipboard'));}
-function download(){if(!DRAFTS.length)return;const b=new Blob([DRAFTS.join('\n')],{type:'text/plain'});const a=document.createElement('a');a.href=URL.createObjectURL(b);a.download='outreach_drafts.txt';a.click();}
 
-// Contact category → what you're asking FOR
-const ASKS = {
-  agents: [
-    { value: 'list_with_us', label: 'List properties with us', hint: 'Positioning as buyer\'s agent or broker' },
-    { value: 'send_deals', label: 'Send us off-market deals', hint: 'Direct wholesaler outreach' },
-    { value: 'partner', label: 'Partnership opportunity', hint: 'Co-brokerage or referral' },
-    { value: 'training', label: 'Attend our training', hint: 'CE credit or sales training' }
-  ],
-  brokers: [
-    { value: 'network', label: 'Join our broker network', hint: 'Multi-broker partnership' },
-    { value: 'deals', label: 'Send us deals', hint: 'Wholesale or direct investment' },
-    { value: 'training', label: 'Training/coaching', hint: 'Team development' },
-    { value: 'partnership', label: 'Strategic partnership', hint: 'Co-brokerage or JV' }
-  ],
-  ce_coaches: [
-    { value: 'teach_system', label: 'Teach our system to your students', hint: 'Revenue share on CE courses' },
-    { value: 'partnership', label: 'Co-training partnership', hint: 'Joint course development' },
-    { value: 'resell', label: 'Resell our training', hint: 'White-label option' }
-  ],
-  storage_owners: [
-    { value: 'buy', label: 'Buy your facility', hint: 'Direct acquisition offer' },
-    { value: 'management', label: 'Manage your property', hint: 'Professional management' },
-    { value: 'expand', label: 'Partner on expansion', hint: 'Development partnership' }
-  ],
-  mhp_owners: [
-    { value: 'buy', label: 'Buy your park', hint: 'Cash offer' },
-    { value: 'management', label: 'Manage/acquire', hint: 'Passive income opportunity' },
-    { value: 'partnership', label: 'Growth partnership', hint: 'Development collaboration' }
-  ],
-  other: [
-    { value: 'custom', label: 'Custom message', hint: 'Write your own' }
-  ]
-};
-
-// ASK TEMPLATES (generated per category + ask)
-const ASK_TEMPLATES = {
-  agents_list_with_us: {
-    subject: 'Listing opportunity in {{city}}, {{state}}',
-    body: "Hi {{owner_first}},\n\nQuick note — we work with sellers in {{city}}, {{state}} who want a faster, more certain sale. {{company}} has a strong reputation and we'd love to have you as our listing agent on a recent acquisition.\n\nWorth a brief call to discuss?\n\n{{sender}}\n{{phone}}"
-  },
-  agents_send_deals: {
-    subject: 'Off-market deals for your buyers',
-    body: "Hi {{owner_first}},\n\nI work with active buyers in {{state}} looking for investment properties. We handle the rehab and hold, so we buy before retail appreciation. If you have buyers fitting that profile, I'd love to be a source for you.\n\nOpen to a quick conversation?\n\n{{sender}}\n{{phone}}"
-  },
-  brokers_network: {
-    subject: 'Broker network opportunity — {{state}}',
-    body: "Hi {{owner_first}},\n\nWe're building a broker network across {{state}} for off-market deals and wholesale. {{company}} would be a strong fit. We'd connect your buyers with our deals, and split commissions 50/50.\n\nWorth exploring?\n\n{{sender}}\n{{phone}}"
-  },
-  ce_coaches_teach_system: {
-    subject: 'CE partnership opportunity',
-    body: "Hi {{owner_first}},\n\nWe've built a real estate investment system that gets strong reviews. {{company}} could offer it as a CE course + keep 30% of revenue. No upfront cost, minimal setup.\n\nInterested in a partnership conversation?\n\n{{sender}}\n{{phone}}"
-  },
-  storage_owners_buy: {
-    subject: 'Acquisition offer for {{company}}',
-    body: "Hi {{owner_first}},\n\nWe acquire self-storage facilities in {{city}}, {{state}}. {{company}} is on our shortlist. We can close with cash in 30-45 days with no contingencies.\n\nWould you consider an offer?\n\n{{sender}}\n{{phone}}"
-  },
-  mhp_owners_buy: {
-    subject: 'Acquisition interest — {{company}}',
-    body: "Hi {{owner_first}},\n\nWe buy mobile home parks in {{state}}. {{company}} in {{city}} came up in our search. We move fast with cash and can handle everything.\n\nOpen to a discussion?\n\n{{sender}}\n{{phone}}"
-  }
-};
-
-document.getElementById('contactCategory').onchange = e => {
-  const cat = e.target.value;
-  const askSel = document.getElementById('ask');
-  const hint = document.getElementById('askHint');
-  askSel.innerHTML = '<option value="">— Choose what you want —</option>';
-  if (cat && ASKS[cat]) {
-    ASKS[cat].forEach(a => {
-      const o = document.createElement('option');
-      o.value = a.value;
-      o.textContent = a.label;
-      o.dataset.hint = a.hint;
-      askSel.appendChild(o);
-    });
-    askSel.style.display = 'block';
-    hint.style.display = 'block';
-  } else {
-    askSel.style.display = 'none';
-    hint.style.display = 'none';
-  }
-};
-
-document.getElementById('ask').onchange = e => {
-  const hint = document.getElementById('askHint');
-  hint.textContent = e.target.options[e.target.selectedIndex].dataset.hint || '';
-  if (e.target.value) generateMessageFromAsk();
-};
-
-function generateMessageFromAsk() {
-  const cat = document.getElementById('contactCategory').value;
-  const ask = document.getElementById('ask').value;
-  if (!cat || !ask) return;
-  const key = cat + '_' + ask;
-  const tpl = ASK_TEMPLATES[key] || ASK_TEMPLATES.storage_owners_buy; // fallback
-  document.getElementById('subject').value = tpl.subject;
-  document.getElementById('body').value = tpl.body;
+function copyAll(){
+  const drafts=document.querySelectorAll('.draft');
+  if(!drafts.length){alert('Generate drafts first');return}
+  let txt='';
+  drafts.forEach(d=>{
+    txt+=d.innerText+'\n\n---\n\n';
+  });
+  navigator.clipboard.writeText(txt).then(()=>alert('Copied!'));
 }
 
-// Scraper integration
-const SCRAPER_URL = 'https://rei-email-scraper-production.up.railway.app';
-document.getElementById('scraper').onchange=e=>{
-  const stateNeeded=['storage_owners','mhp_owners'].includes(e.target.value);
-  document.getElementById('stateLabel').style.display=stateNeeded?'block':'none';
-  document.getElementById('states').style.display=stateNeeded?'block':'none';
-};
-
-async function triggerScraper(){
-  const scraperId=document.getElementById('scraper').value;
-  if(!scraperId){alert('Choose a category');return;}
-  const status=document.getElementById('scrapeStatus');
-  status.textContent='Scraping...';
-  try{
-    const body=scraperId.includes('owners')?{states:document.getElementById('states').value.split(',').map(s=>s.toUpperCase().trim()).filter(s=>s)}:{};
-    const res=await fetch(`${SCRAPER_URL}/api/scrape/${scraperId}`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(body)});
-    const data=await res.json();
-    if(!data.ok && data.error){status.textContent=`Error: ${data.error}`;return;}
-    if(data.note){status.textContent=data.note;return;}
-    if(data.data.length===0){status.textContent='No results yet. This category is being built out.';return;}
-    const csv=data.headers?[data.headers,...data.data.map(r=>data.headers.map(h=>r[h]).join(','))].join('\n'):'';
-    if(csv){document.getElementById('csv').value=csv;status.textContent=`✓ Loaded ${data.count} contacts`;}
-  }catch(e){status.textContent=`Error: ${e.message}. Is the scraper service running?`;}
+function download(){
+  const drafts=document.querySelectorAll('.draft');
+  if(!drafts.length){alert('Generate drafts first');return}
+  let txt='';
+  drafts.forEach(d=>{
+    txt+=d.innerText+'\n\n---\n\n';
+  });
+  const a=document.createElement('a');
+  a.href='data:text/plain;charset=utf-8,'+encodeURIComponent(txt);
+  a.download='outreach-drafts.txt';
+  a.click();
 }
 </script>
 </body>
