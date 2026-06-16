@@ -40,10 +40,10 @@
   <!-- LEFT: controls -->
   <div>
     <div class="card">
-      <h2>1 · Asset type &amp; mode</h2>
-      <label>Asset type</label>
+      <h2>1 · Target &amp; channel</h2>
+      <label>What are you buying?</label>
       <select id="asset"></select>
-      <label>Channel</label>
+      <label>How to reach them?</label>
       <select id="channel"><option value="email">Email draft (mail-merge)</option><option value="call">Phone / voice script</option></select>
       <label>Your sign-off name</label>
       <input id="sender" value="Steve · Gorilla Realty">
@@ -52,29 +52,32 @@
     </div>
 
     <div class="card">
-      <h2>2a · Auto-scrape email lists (or paste your own)</h2>
-      <p class="muted">Quick-generate lists by category: CE coaches, brokers, agents, storage/MHP owners (by state). Or upload/paste your own CSV.</p>
-      <label>Quick scrape by category</label>
-      <select id="scraper">
-        <option value="">— Choose a category to scrape —</option>
-        <option value="ce_coaches">CE Coaches (national)</option>
-        <option value="broker_coaches_pa">Broker/Sales Coaches (PA)</option>
-        <option value="agents_pa">Real Estate Agents (PA)</option>
-        <option value="brokers_pa">Brokers (PA)</option>
-        <option value="storage_owners">Storage Owners (by state)</option>
-        <option value="mhp_owners">MHP Owners (by state)</option>
-      </select>
-      <label id="stateLabel" style="display:none;margin-top:8px">States (comma-sep: PA,OH,NY)</label>
-      <input id="states" type="text" placeholder="PA,OH,NY" style="display:none;margin-bottom:8px">
-      <button onclick="triggerScraper()" style="margin-top:8px">Get list →</button>
-      <p id="scrapeStatus" class="muted" style="margin-top:6px"></p>
-    </div>
+      <h2>2 · Get your contact list</h2>
+      <p class="muted">Pick one: auto-scrape by category, upload a file, or paste CSV. Recognized columns: <code>owner_name, company, email, phone, city, state, address</code>.</p>
 
-    <div class="card">
-      <h2>2b · Your lead list</h2>
-      <p class="muted">CSV with a header row. Recognized columns (any subset): <code>owner_name, company, email, phone, city, state, address</code>. Use scraped list above, export from TractIQ, or paste your own.</p>
-      <input type="file" id="file" accept=".csv,.txt" style="margin:6px 0">
-      <label>…or paste CSV here</label>
+      <div style="margin-bottom:14px;padding:10px;background:#f0f4f8;border-radius:6px">
+        <label style="margin-bottom:8px">Auto-scrape by category</label>
+        <select id="scraper" style="margin-bottom:8px">
+          <option value="">— Choose a category —</option>
+          <option value="ce_coaches">CE Coaches (national)</option>
+          <option value="broker_coaches_pa">Broker/Sales Coaches (PA)</option>
+          <option value="agents_pa">Real Estate Agents (PA)</option>
+          <option value="brokers_pa">Brokers (PA)</option>
+          <option value="storage_owners">Storage Owners (by state)</option>
+          <option value="mhp_owners">MHP Owners (by state)</option>
+        </select>
+        <label id="stateLabel" style="display:none;margin-top:8px;margin-bottom:3px">States (PA,OH,NY)</label>
+        <input id="states" type="text" placeholder="PA,OH,NY" style="display:none;margin-bottom:8px">
+        <button onclick="triggerScraper()" style="width:100%">Scrape list →</button>
+        <p id="scrapeStatus" class="muted" style="margin:6px 0 0"></p>
+      </div>
+
+      <p style="margin:8px 0;text-align:center;color:#999">or</p>
+
+      <label>Upload CSV file</label>
+      <input type="file" id="file" accept=".csv,.txt" style="margin-bottom:8px">
+
+      <label>Or paste CSV here</label>
       <textarea id="csv" placeholder="owner_name,company,email,phone,city,state&#10;Amanda Ritchie,Bolt Storage,amanda@boltstorage.com,(575) 442-2616,Ithaca,NY"></textarea>
     </div>
 
@@ -94,15 +97,14 @@
   <!-- RIGHT: output + instructions -->
   <div>
     <div class="card">
-      <h2>Instructions</h2>
+      <h2>How it works</h2>
       <ol>
-        <li>Pick the <b>asset type</b> — the template auto-loads acquisition copy tuned for that asset.</li>
-        <li>Paste or upload your <b>lead list</b> (CSV). For storage, export from TractIQ; for MHP, your scraped + skip-traced list; or pull any campaign from Franco's Owner Outreach Directory.</li>
-        <li>Tweak the <b>subject/body</b> if you want — merge fields fill per row.</li>
-        <li>Click <b>Generate drafts</b> → personalized emails appear. <b>Copy all</b> or <b>Download .txt</b>, then paste into your sender (Gmail mail-merge, GHL, or Franco's queue).</li>
-        <li>For phone-only leads, switch <b>Channel → Phone</b> for the REBA-style call script.</li>
+        <li><b>Pick your target:</b> Asset type (MHP, storage, etc) → template auto-loads acquisition copy.</li>
+        <li><b>Get contacts:</b> Scrape by category, upload CSV, or paste. Template auto-fills merge fields.</li>
+        <li><b>Customize:</b> Tweak subject/body. Preview uses actual contact data.</li>
+        <li><b>Generate:</b> Click → personalized drafts. Copy all or download, then paste into Gmail/GHL/Franco.</li>
       </ol>
-      <p class="muted" style="margin-top:8px">Nothing sends from here — this only drafts. Review every message before sending. (Compliance: include a real opt-out and only contact business/owner contacts.)</p>
+      <p class="muted" style="margin-top:8px">Drafts only. You review before sending. (Compliance: include opt-out, contact business owners only.)</p>
     </div>
     <div class="card">
       <h2>Drafts <span id="count" class="pill">0</span></h2>
