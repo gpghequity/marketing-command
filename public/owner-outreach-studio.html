@@ -52,8 +52,27 @@
     </div>
 
     <div class="card">
-      <h2>2 · Paste your lead list</h2>
-      <p class="muted">CSV with a header row. Recognized columns (any subset): <code>owner_name, company, email, phone, city, state, address</code>. Export from Franco's <em>Owner Outreach Directory</em>, TractIQ, or your scraped list.</p>
+      <h2>2a · Auto-scrape email lists (or paste your own)</h2>
+      <p class="muted">Quick-generate lists by category: CE coaches, brokers, agents, storage/MHP owners (by state). Or upload/paste your own CSV.</p>
+      <label>Quick scrape by category</label>
+      <select id="scraper">
+        <option value="">— Choose a category to scrape —</option>
+        <option value="ce_coaches">CE Coaches (national)</option>
+        <option value="broker_coaches_pa">Broker/Sales Coaches (PA)</option>
+        <option value="agents_pa">Real Estate Agents (PA)</option>
+        <option value="brokers_pa">Brokers (PA)</option>
+        <option value="storage_owners">Storage Owners (by state)</option>
+        <option value="mhp_owners">MHP Owners (by state)</option>
+      </select>
+      <label id="stateLabel" style="display:none;margin-top:8px">States (comma-sep: PA,OH,NY)</label>
+      <input id="states" type="text" placeholder="PA,OH,NY" style="display:none;margin-bottom:8px">
+      <button onclick="triggerScraper()" style="margin-top:8px">Get list →</button>
+      <p id="scrapeStatus" class="muted" style="margin-top:6px"></p>
+    </div>
+
+    <div class="card">
+      <h2>2b · Your lead list</h2>
+      <p class="muted">CSV with a header row. Recognized columns (any subset): <code>owner_name, company, email, phone, city, state, address</code>. Use scraped list above, export from TractIQ, or paste your own.</p>
       <input type="file" id="file" accept=".csv,.txt" style="margin:6px 0">
       <label>…or paste CSV here</label>
       <textarea id="csv" placeholder="owner_name,company,email,phone,city,state&#10;Amanda Ritchie,Bolt Storage,amanda@boltstorage.com,(575) 442-2616,Ithaca,NY"></textarea>
@@ -150,6 +169,31 @@ function gen(){
 }
 function copyAll(){if(!DRAFTS.length)return;navigator.clipboard.writeText(DRAFTS.join('\n')).then(()=>alert('Copied '+DRAFTS.length+' drafts to clipboard'));}
 function download(){if(!DRAFTS.length)return;const b=new Blob([DRAFTS.join('\n')],{type:'text/plain'});const a=document.createElement('a');a.href=URL.createObjectURL(b);a.download='outreach_drafts.txt';a.click();}
+
+// Scraper integration
+const SCRAPER_URL = 'https://rei-email-scraper-production.up.railway.app';
+document.getElementById('scraper').onchange=e=>{
+  const stateNeeded=['storage_owners','mhp_owners'].includes(e.target.value);
+  document.getElementById('stateLabel').style.display=stateNeeded?'block':'none';
+  document.getElementById('states').style.display=stateNeeded?'block':'none';
+};
+
+async function triggerScraper(){
+  const scraperId=document.getElementById('scraper').value;
+  if(!scraperId){alert('Choose a category');return;}
+  const status=document.getElementById('scrapeStatus');
+  status.textContent='Scraping...';
+  try{
+    const body=scraperId.includes('owners')?{states:document.getElementById('states').value.split(',').map(s=>s.toUpperCase().trim()).filter(s=>s)}:{};
+    const res=await fetch(`${SCRAPER_URL}/api/scrape/${scraperId}`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(body)});
+    const data=await res.json();
+    if(!data.ok && data.error){status.textContent=`Error: ${data.error}`;return;}
+    if(data.note){status.textContent=data.note;return;}
+    if(data.data.length===0){status.textContent='No results yet. This category is being built out.';return;}
+    const csv=data.headers?[data.headers,...data.data.map(r=>data.headers.map(h=>r[h]).join(','))].join('\n'):'';
+    if(csv){document.getElementById('csv').value=csv;status.textContent=`✓ Loaded ${data.count} contacts`;}
+  }catch(e){status.textContent=`Error: ${e.message}. Is the scraper service running?`;}
+}
 </script>
 </body>
 </html>
