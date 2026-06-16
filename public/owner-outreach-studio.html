@@ -166,7 +166,7 @@ function triggerScraper(){
     if(!states){alert('Enter states (PA,OH,NY)');return}
   }
   document.getElementById('scrapeStatus').textContent='Scraping...';
-  fetch(`https://scraper-live-production.up.railway.app/api/scrape/${cat}`,{method:'POST'})
+  fetch(`https://rei-scraper-fresh.vercel.app/api/scrape/${cat}`,{method:'POST'})
     .then(r=>r.json())
     .then(data=>{
       if(data.error){
