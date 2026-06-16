@@ -162,6 +162,10 @@ app.get(['/owner-outreach-studio', '/owner-outreach-studio.html'], (req, res) =>
   res.sendFile(path.join(__dirname, 'public', 'owner-outreach-studio.html'));
 });
 
+app.get(['/email-campaign-hub', '/email-campaign-hub.html'], (req, res) => {
+  res.sendFile(path.join(__dirname, 'public', 'email-campaign-hub.html'));
+});
+
 app.get('/tools', (req, res) => {
   res.render('tools', { tools: TOOLS_CATALOG });
 });
