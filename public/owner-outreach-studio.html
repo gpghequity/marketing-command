@@ -165,10 +165,20 @@ function triggerScraper(){
     const states=document.getElementById('states').value.trim();
     if(!states){alert('Enter states (PA,OH,NY)');return}
   }
-  document.getElementById('scrapeStatus').textContent='Scraping... (this is a placeholder until the scraper deploys)';
-  setTimeout(()=>{
-    document.getElementById('scrapeStatus').textContent='Scraper is currently offline. Paste CSV manually or upload a file.';
-  },1500);
+  document.getElementById('scrapeStatus').textContent='Scraping...';
+  fetch(`/api/scrape/${cat}`,{method:'POST'})
+    .then(r=>r.json())
+    .then(data=>{
+      if(data.error){
+        document.getElementById('scrapeStatus').textContent=`Error: ${data.error}`;
+        return;
+      }
+      document.getElementById('csv').value=data.data.map(row=>`${row.name},${row.company},${row.email},${row.phone},${row.city},${row.state}`).join('\n');
+      document.getElementById('scrapeStatus').textContent=`✓ Scraped ${data.count} contacts. Ready in CSV field.`;
+    })
+    .catch(e=>{
+      document.getElementById('scrapeStatus').textContent=`Error: ${e.message}`;
+    });
 }
 
 document.getElementById('scraper').addEventListener('change',()=>{
